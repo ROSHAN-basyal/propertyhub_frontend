@@ -2,68 +2,52 @@ import 'package:flutter/material.dart';
 import 'package:propertyhub/api_service.dart';
 import 'login.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({super.key});
+class Forget extends StatefulWidget {
+  const Forget({super.key});
 
   @override
-  State<Signup> createState() => _SignupState();
+  State<Forget> createState() => _ForgetpwState();
 }
 
-class _SignupState extends State<Signup> {
+class _ForgetpwState extends State<Forget> {
   bool obscureText = true;
-
-  // Controllers to get user input
-  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-
-  Future<void> signup() async {
-    final username = _nameController.text.trim();
+   Future<void> forgetpw() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if (email.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
-    int success = await ApiService.signupUser(username, email, password);
 
-    if (success==1) {
+    int success = await ApiService.forgetpw(email, password);
+
+    if (success == 1) {
+      // password changed
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text('Signup successful!')));
+      ).showSnackBar(const SnackBar(content: Text('Password changed successful!y')));
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Login()),
       );
-    } else if(success==2) {
+    } else if (success == 2) {
+      // Try to parse error message
       ScaffoldMessenger.of(
-        
-        context
-      ).showSnackBar(const SnackBar(content: Text('Email already registered')));
-    }
-  
-  else {
-     ScaffoldMessenger.of(
-        
-        context
-      ).showSnackBar(const SnackBar(content: Text('Signup Failed')));
-  }}
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Error')));
+    } 
+  }
+
 
   void _togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
     });
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
   }
 
   @override
@@ -75,7 +59,7 @@ class _SignupState extends State<Signup> {
         backgroundColor: Colors.deepPurple,
         elevation: 4,
         title: const Text(
-          'Create Account',
+          'Reset Password',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
@@ -93,32 +77,6 @@ class _SignupState extends State<Signup> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Sign up to PropertyHub',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.person, color: Colors.deepPurple),
-                      hintText: 'Enter your name',
-                      filled: true,
-                      fillColor: Colors.white,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 16,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
                   TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
@@ -141,7 +99,7 @@ class _SignupState extends State<Signup> {
                     obscureText: obscureText,
                     decoration: InputDecoration(
                       prefixIcon: Icon(Icons.lock, color: Colors.deepPurple),
-                      hintText: 'Enter password',
+                      hintText: 'Enter new password',
                       filled: true,
                       fillColor: Colors.white,
                       contentPadding: const EdgeInsets.symmetric(
@@ -160,20 +118,20 @@ class _SignupState extends State<Signup> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: signup,
+                      onPressed: forgetpw,
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Colors.deepPurple,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        backgroundColor: Colors.deepPurple,
                       ),
                       child: const Text(
-                        'Sign Up',
+                        'Reset Password',
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
@@ -181,13 +139,13 @@ class _SignupState extends State<Signup> {
                   const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(builder: (context) => const Login()),
                       );
                     },
                     child: const Text(
-                      'Already have an account? Login',
+                      'Back to login',
                       style: TextStyle(color: Colors.deepPurple),
                     ),
                   ),

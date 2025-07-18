@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:propertyhub/api_service.dart';
-
+import 'forgetpw.dart';
 
 import 'home.dart';
 
@@ -12,46 +12,45 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  
-  
   bool obscureText = true;
 
   // Controllers to capture input
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-
-
-
   Future<void> login() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
-   bool success = await ApiService.loginUser(email, password);
+    int success = await ApiService.loginUser(email, password);
 
-
-      if (success) {
-        // Successful login
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login successful!')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const PropertyHomePage()),
-        );
-      } else {
-        // Try to parse error message
-      ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login failed!')),
-        );
-  }}
+    if (success == 1) {
+      // Successful login
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PropertyHomePage()),
+      );
+    } else if (success == 2) {
+      // Try to parse error message
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Wrong Password')));
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Login failed')));
+    }
+  }
 
   void _togglePasswordVisibility() {
     setState(() {
@@ -118,8 +117,10 @@ class _LoginState extends State<Login> {
                       hintText: 'Enter your email',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -134,8 +135,10 @@ class _LoginState extends State<Login> {
                       hintText: 'Enter your password',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -169,7 +172,9 @@ class _LoginState extends State<Login> {
                   const SizedBox(height: 10),
                   TextButton(
                     onPressed: () {
-                      // Optional: Add forgot password functionality later
+                       Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Forget()),);
                     },
                     child: const Text(
                       'Forgot Password?',
