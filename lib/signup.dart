@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
+import 'package:propertyhub/api_service.dart';
 import 'login.dart';
 
 class Signup extends StatefulWidget {
@@ -19,74 +17,32 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Replace with your backend URL (adjust for emulator/device)
-  static const String baseUrl = 'http://10.0.2.2:8000'; // For Android emulator
-
   Future<void> signup() async {
-    final name = _nameController.text.trim();
+    final username = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
+    bool success = await ApiService.signupUser(username, email, password);
 
-    final url = Uri.parse('$baseUrl/api/signup/');
-
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'username': name,
-          'email': email,
-          'password': password,
-        }),
+    if (success) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Signup successful!')));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Login()),
       );
-
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        try {
-          final responseData = jsonDecode(response.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Signup successful!')),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const Login()),
-          );
-        } catch (e) {
-          print('JSON parsing failed: $e');
-          print('Response body: ${response.body}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected response from server')),
-          );
-        }
-      } else {
-        try {
-          final responseData = jsonDecode(response.body);
-          String errorMsg = responseData['error'] ?? 'Signup failed';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMsg)),
-          );
-        } catch (e) {
-          print('JSON parsing failed on error response: $e');
-          print('Response body: ${response.body}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Signup failed with unexpected response')),
-          );
-        }
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error connecting to server')),
-      );
-      print('Signup error: $e');
+    } else {
+      ScaffoldMessenger.of(
+        
+        context
+      ).showSnackBar(const SnackBar(content: Text('Signup failed')));
     }
   }
 
@@ -147,8 +103,10 @@ class _SignupState extends State<Signup> {
                       hintText: 'Enter your name',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -162,8 +120,10 @@ class _SignupState extends State<Signup> {
                       hintText: 'Enter your email',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -178,8 +138,10 @@ class _SignupState extends State<Signup> {
                       hintText: 'Enter password',
                       filled: true,
                       fillColor: Colors.white,
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:propertyhub/api_service.dart';
+
 
 import 'home.dart';
 
@@ -20,8 +20,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
-  // Your backend URL (adjust if needed)
-  static const String baseUrl = 'http://10.0.2.2:8000';
+
 
 
   Future<void> login() async {
@@ -35,22 +34,10 @@ class _LoginState extends State<Login> {
       return;
     }
 
-    final url = Uri.parse('$baseUrl/api/login/');
+   bool success = await ApiService.loginUser(email, password);
 
-    try {
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
-      );
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
+      if (success) {
         // Successful login
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login successful!')),
@@ -61,26 +48,10 @@ class _LoginState extends State<Login> {
         );
       } else {
         // Try to parse error message
-        try {
-          final responseData = jsonDecode(response.body);
-          String errorMsg = responseData['error'] ?? 'Login failed';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(errorMsg)),
-          );
-        } catch (e) {
-          // Unexpected response format
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Login failed with unexpected response')),
-          );
-        }
-      }
-    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error connecting to server')),
-      );
-      print('Login error: $e');
-    }
-  }
+          const SnackBar(content: Text('Login failed!')),
+        );
+  }}
 
   void _togglePasswordVisibility() {
     setState(() {
