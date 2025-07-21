@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class Seller extends StatefulWidget {
-  const Seller({super.key});
+class Buyer extends StatefulWidget {
+  const Buyer({super.key});
 
   @override
-  State<StatefulWidget> createState() => _SellerState();
+  State<StatefulWidget> createState() => _BuyerState();
 }
 
-class _SellerState extends State<Seller> {
+class _BuyerState extends State<Buyer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,7 +18,7 @@ class _SellerState extends State<Seller> {
         backgroundColor: Color.fromARGB(255, 131, 146, 241),
         iconTheme: const IconThemeData(color: Colors.black),
         title: const Text(
-          'Sell your Property',
+          'Rent the Property',
           style: TextStyle(
             color: Colors.black,
             fontWeight: FontWeight.bold,
@@ -41,7 +41,7 @@ class _SellerState extends State<Seller> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  '📝 Fill in the form below to post your property.',
+                  '📝 Filter by.',
                   style: TextStyle(fontSize: 16, color: Colors.black87),
                 ),
                 const SizedBox(height: 20),
@@ -60,30 +60,23 @@ class _SellerState extends State<Seller> {
                 const SizedBox(height: 12),
 
                 // 🏠 Type
-                DropdownButtonFormField<String>(
+                TextField(
                   decoration: InputDecoration(
                     labelText: 'Type',
-
+                    hintText: 'e.g. Single, 1BHK, 2BHK',
                     prefixIcon: Icon(Icons.home_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  items: ['Single', '1BK', '2BK', '1BHK', '2BHK'].map((type) {
-                    return DropdownMenuItem(value: type, child: Text(type));
-                  }).toList(),
-                  onChanged: (value) {
-                    // Handle selection
-                  },
                 ),
-
                 const SizedBox(height: 12),
 
                 TextField(
                   keyboardType: TextInputType.number,
                   decoration: InputDecoration(
-                    labelText: 'Rent (Rs.per month)',
-                    hintText: 'e.g. 15000',
+                    labelText: 'Price Range',
+                    hintText: 'e.g. 10000-15000',
                     prefixIcon: Icon(Icons.currency_rupee), // ₹ icon
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -91,35 +84,6 @@ class _SellerState extends State<Seller> {
                   ),
                 ),
 
-                const SizedBox(height: 12),
-
-                // 📞 Contact
-                TextField(
-                  keyboardType: TextInputType.phone,
-                  decoration: InputDecoration(
-                    labelText: 'Contact Number',
-                    hintText: 'e.g. 9800000000',
-                    prefixIcon: Icon(Icons.phone),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-
-                // 📝 Description
-                TextField(
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    labelText: 'Description',
-                    hintText:
-                        'Add details about the property, surroundings, etc.',
-                    alignLabelWithHint: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 24),
 
                 // 📤 Post Button
@@ -131,7 +95,7 @@ class _SellerState extends State<Seller> {
                     },
                     icon: Icon(Icons.post_add),
                     label: Text(
-                      'Post the Property',
+                      'Search for Property',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

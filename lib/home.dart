@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'login.dart';
 import 'about.dart';
 import 'seller.dart';
+import 'buyer.dart';
 
 class PropertyHomePage extends StatelessWidget {
   const PropertyHomePage({super.key});
@@ -107,7 +108,12 @@ class PropertyHomePage extends StatelessWidget {
                       ),
                       color: Colors.deepPurple.shade400,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => Buyer()),
+                          );
+                        },
                         borderRadius: BorderRadius.circular(20),
                         child: Padding(
                           padding: const EdgeInsets.all(20.0),
