@@ -3,6 +3,7 @@ import 'login.dart';
 import 'about.dart';
 import 'seller.dart';
 import 'buyer.dart';
+import 'profile.dart';
 
 class PropertyHomePage extends StatelessWidget {
   const PropertyHomePage({super.key});
@@ -64,7 +65,11 @@ class PropertyHomePage extends StatelessWidget {
               leading: Icon(Icons.person),
               title: Text('Profile'),
               onTap: () {
-                Navigator.pop(context);
+                 Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>  Profile()
+                    ));
               },
             ),
             ListTile(
@@ -109,7 +114,7 @@ class PropertyHomePage extends StatelessWidget {
                       color: Colors.deepPurple.shade400,
                       child: InkWell(
                         onTap: () {
-                          Navigator.pushReplacement(
+                          Navigator.push(
                             context,
                             MaterialPageRoute(builder: (context) => Buyer()),
                           );
@@ -227,7 +232,7 @@ class PropertyHomePage extends StatelessWidget {
                         ),
                         child: Text(
                           "Search Properties",
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16,color: Colors.white),
                         ),
                       ),
                     ),

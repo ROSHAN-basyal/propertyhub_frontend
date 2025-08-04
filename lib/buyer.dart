@@ -60,15 +60,21 @@ class _BuyerState extends State<Buyer> {
                 const SizedBox(height: 12),
 
                 // 🏠 Type
-                TextField(
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                     labelText: 'Type',
-                    hintText: 'e.g. Single, 1BHK, 2BHK',
+
                     prefixIcon: Icon(Icons.home_outlined),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
+                  items: ['Single', '1BK', '2BK', '1BHK', '2BHK'].map((type) {
+                    return DropdownMenuItem(value: type, child: Text(type));
+                  }).toList(),
+                  onChanged: (value) {
+                    // Handle selection
+                  },
                 ),
                 const SizedBox(height: 12),
 

@@ -21,8 +21,10 @@ class ApiService {
         'password': password,
       }),
     );
-
+    
     if (response.statusCode == 200 || response.statusCode == 201) {
+        
+    
       return 1; // signup success
     }
     else if(response.statusCode==400){
