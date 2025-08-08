@@ -27,7 +27,7 @@ class ApiService {
     
       return 1; // signup success
     }
-    else if(response.statusCode==400){
+    else if(response.statusCode==409){
       return 2;
     }
      else {
