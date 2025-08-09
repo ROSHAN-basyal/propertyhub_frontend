@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:propertyhub/api_service.dart';
 import 'forgetpw.dart';
+import 'HomeWithBottomNav.dart';
 
 import 'home.dart';
 
@@ -36,10 +37,10 @@ class _LoginState extends State<Login> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text('Login successful!')));
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const PropertyHomePage()),
-      );
+       Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const HomeWithBottomNav()),
+  );
     } else if (success == 2) {
       // Try to parse error message
       ScaffoldMessenger.of(
