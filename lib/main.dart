@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'signup.dart';
+import 'globals.dart'as globals;
 
 void main() {
   runApp(PropertyHubApp());
