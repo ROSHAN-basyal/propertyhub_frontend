@@ -41,7 +41,7 @@ class ApiService {
   }
 
   static Future<int> loginUser(String email, String password) async {
-    final url = Uri.parse('$baseUrl/api/login/');
+    final url = Uri.parse('$baseUrl/api/users/login/');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
@@ -111,7 +111,7 @@ static Future<int> forgetpw(String email, String password) async {
   }
 
   static Future<List<dynamic>> fetchProperties() async {
-    final url = Uri.parse('$baseUrl/api/properties/');
+    final url = Uri.parse('$baseUrl/api/properties/getproperties');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

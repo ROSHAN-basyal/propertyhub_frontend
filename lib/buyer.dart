@@ -103,10 +103,9 @@ class _BuyerState extends State<Buyer> {
                     const SizedBox(height: 4),
                      Text("Property ID: ${prop['property_id']}",
                         overflow: TextOverflow.ellipsis, maxLines: 1),
-                         Text("User ID: ${prop['userid']}",
+                    Text("User ID: ${prop['listed_by_user_id']}",
                         overflow: TextOverflow.ellipsis, maxLines: 1),
-                      
-                        Text("Listed by: ${prop['listed_by_username']}",
+                    Text("Listed by: ${prop['listed_by_username']}",
                         overflow: TextOverflow.ellipsis, maxLines: 1),
                     Text("Type: ${prop['property_type']}",
                         overflow: TextOverflow.ellipsis, maxLines: 1),
