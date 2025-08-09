@@ -30,14 +30,7 @@ class _ProfileState extends State<Profile> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
-            // Profile Picture
-            const CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage(
-                'assets/Rohit_photo.jpeg',
-              ), // Use your image here
-              backgroundColor: Colors.white,
-            ),
+            
             const SizedBox(height: 15),
             
           

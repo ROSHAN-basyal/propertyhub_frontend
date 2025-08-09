@@ -101,6 +101,13 @@ class _BuyerState extends State<Buyer> {
                       maxLines: 1,
                     ),
                     const SizedBox(height: 4),
+                     Text("Property ID: ${prop['property_id']}",
+                        overflow: TextOverflow.ellipsis, maxLines: 1),
+                         Text("User ID: ${prop['userid']}",
+                        overflow: TextOverflow.ellipsis, maxLines: 1),
+                      
+                        Text("Listed by: ${prop['listed_by_username']}",
+                        overflow: TextOverflow.ellipsis, maxLines: 1),
                     Text("Type: ${prop['property_type']}",
                         overflow: TextOverflow.ellipsis, maxLines: 1),
                     Text("Rent: Rs. ${prop['rent']}",
@@ -243,8 +250,20 @@ class _BuyerState extends State<Buyer> {
             TextField(
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                labelText: 'Price Range',
-                hintText: 'e.g. 10000-15000',
+                labelText: 'Min price',
+                hintText: 'in Rs.',
+                prefixIcon: const Icon(Icons.currency_rupee),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Max price',
+                hintText: 'in Rs.',
                 prefixIcon: const Icon(Icons.currency_rupee),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
