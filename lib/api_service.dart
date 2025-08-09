@@ -11,7 +11,7 @@ class ApiService {
     String email,
     String password,
   ) async {
-    final url = Uri.parse('$baseUrl/api/signup/'); // adjust your endpoint path
+    final url = Uri.parse('$baseUrl/api/users/signup/'); // adjust your endpoint path
 
     final response = await http.post(
       url,
@@ -90,6 +90,7 @@ static Future<int> forgetpw(String email, String password) async {
         url,
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
+          "user_id": globals.user_id,
           "area_location": areaLocation,
           "property_type": propertyType,
           "rent": rent,
