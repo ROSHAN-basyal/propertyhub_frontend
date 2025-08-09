@@ -18,6 +18,8 @@ class _SignupState extends State<Signup> {
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> signup() async {
+    
+  
     final username = _nameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
@@ -42,14 +44,14 @@ class _SignupState extends State<Signup> {
       ScaffoldMessenger.of(
         
         context
-      ).showSnackBar(const SnackBar(content: Text('Email already registered')));
+      ).showSnackBar(SnackBar(content: Text('Email already registered ')));
     }
   
   else {
      ScaffoldMessenger.of(
         
         context
-      ).showSnackBar(const SnackBar(content: Text('Signup Failed')));
+      ).showSnackBar( SnackBar(content: Text('signup failed with status code: $success')));
   }}
 
   void _togglePasswordVisibility() {
