@@ -121,5 +121,35 @@ static Future<int> forgetpw(String email, String password) async {
     throw Exception("Failed to load properties");
     }
   }
+  
+ static Future<List<dynamic>> searchProperties({
+    required String propertyType,
+    required String location,
+    required int minRent,
+    required int maxRent,
+    required int page,
+  }) async {
+    final url = Uri.parse('$baseUrl/api/properties/searchproperties/');
+    final response = await http.post(
+      url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "property_type": propertyType,
+        "area_location": location,
+        "min_rent": minRent,
+        "max_rent": maxRent,
+        "page": page,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      throw Exception('Failed to fetch properties: ${response.statusCode}');
+    }
+  }
 }
+
 

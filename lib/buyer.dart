@@ -5,42 +5,71 @@ class Buyer extends StatefulWidget {
   const Buyer({super.key});
 
   @override
-  State<StatefulWidget> createState() => _BuyerState();
+  State<Buyer> createState() => _BuyerState();
 }
 
 class _BuyerState extends State<Buyer> {
   List<dynamic> properties = [];
-  bool isLoading = true;
+  bool isLoading = false;
 
   // Track booked property IDs
   Set<int> bookedProperties = {};
 
+  // Controllers for filter inputs
+  final TextEditingController locationController = TextEditingController();
+  final TextEditingController minPriceController = TextEditingController();
+  final TextEditingController maxPriceController = TextEditingController();
+  String? selectedType;
+
   @override
   void initState() {
     super.initState();
-    _loadProperties();
+    _searchProperties(); // Load initial properties on start (empty filters)
   }
 
-  void _loadProperties() async {
+  @override
+  void dispose() {
+    locationController.dispose();
+    minPriceController.dispose();
+    maxPriceController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _searchProperties() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
-      final data = await ApiService.fetchProperties();
+      final results = await ApiService.searchProperties(
+        propertyType: selectedType ?? '',
+        location: locationController.text.trim(),
+        minRent: int.tryParse(minPriceController.text) ?? 0,
+        maxRent: int.tryParse(maxPriceController.text) ?? 9999999,
+        page: 0,
+      );
+
       setState(() {
-        properties = data;
-        isLoading = false;
+        properties = results;
       });
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error fetching properties: $e")),
+      );
+    } finally {
       setState(() {
         isLoading = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Error loading properties")),
-      );
     }
   }
 
-  // Build each property card with booking feature
   Widget buildPropertyCard(Map<String, dynamic> prop) {
-    final bool isBooked = bookedProperties.contains(prop['id']);
+    // Use 'property_id' as unique ID, check booking
+    final int propId = prop['property_id'] is int
+        ? prop['property_id']
+        : int.tryParse(prop['property_id'].toString()) ?? 0;
+
+    final bool isBooked = bookedProperties.contains(propId);
 
     return GestureDetector(
       onTap: () async {
@@ -65,7 +94,7 @@ class _BuyerState extends State<Buyer> {
 
           if (confirm == true) {
             setState(() {
-              bookedProperties.add(prop['id']);
+              bookedProperties.add(propId);
             });
 
             ScaffoldMessenger.of(context).showSnackBar(
@@ -81,8 +110,8 @@ class _BuyerState extends State<Buyer> {
         ),
         margin: const EdgeInsets.symmetric(vertical: 8),
         child: SizedBox(
-          width: 400, // fixed width
-          height: 250, // fixed height
+          width: double.infinity,
+          height: 250,
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Stack(
@@ -92,7 +121,7 @@ class _BuyerState extends State<Buyer> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      prop['area_location'],
+                      prop['area_location'] ?? '',
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -101,32 +130,54 @@ class _BuyerState extends State<Buyer> {
                       maxLines: 1,
                     ),
                     const SizedBox(height: 4),
-                     Text("Property ID: ${prop['property_id']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
-                    Text("User ID: ${prop['listed_by_user_id']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
-                    Text("Listed by: ${prop['listed_by_username']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
-                    Text("Type: ${prop['property_type']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
-                    Text("Rent: Rs. ${prop['rent']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
-                    Text("Contact: ${prop['contact_number']}",
-                        overflow: TextOverflow.ellipsis, maxLines: 1),
+                    Text(
+                      "Property ID: ${prop['property_id']}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "User ID: ${prop['listed_by_user_id']}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "Listed by: ${prop['listed_by_username'] ?? prop['username'] ?? ''}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "Type: ${prop['property_type'] ?? ''}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "Rent: Rs. ${prop['rent'] ?? prop['monthly_rent'] ?? ''}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                    Text(
+                      "Contact: ${prop['contact_number'] ?? ''}",
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
                     const SizedBox(height: 6),
                     Expanded(
                       child: Text(
-                        prop['description'] ?? '',
+                        prop['description'] ??
+                            prop['property_description'] ??
+                            '',
                         style: TextStyle(color: Colors.grey[700]),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 3,
                       ),
                     ),
                     const SizedBox(height: 6),
-                    Text(
-                      "Posted: ${prop['posted_at'].toString().substring(0, 10)}",
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
-                    ),
+                    if (prop['posted_at'] != null)
+                      Text(
+                        "Posted: ${prop['posted_at'].toString().substring(0, 10)}",
+                        style: const TextStyle(
+                            fontSize: 12, color: Colors.grey),
+                      ),
                   ],
                 ),
 
@@ -136,8 +187,8 @@ class _BuyerState extends State<Buyer> {
                     top: 8,
                     right: 8,
                     child: Container(
-                      padding:
-                          const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.green.shade600,
                         borderRadius: BorderRadius.circular(12),
@@ -149,7 +200,8 @@ class _BuyerState extends State<Buyer> {
                           SizedBox(width: 4),
                           Text(
                             'Booked',
-                            style: TextStyle(color: Colors.white, fontSize: 12),
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 12),
                           ),
                         ],
                       ),
@@ -158,6 +210,102 @@ class _BuyerState extends State<Buyer> {
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterForm() {
+    return Card(
+      color: Colors.blue.shade50,
+      elevation: 6,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              '📝 Filter by.',
+              style: TextStyle(fontSize: 16, color: Colors.black87),
+            ),
+            const SizedBox(height: 20),
+            TextField(
+              controller: locationController,
+              decoration: InputDecoration(
+                labelText: 'Area / Location',
+                hintText: 'e.g. New Road, Kathmandu',
+                prefixIcon: const Icon(Icons.location_on),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: selectedType,
+              decoration: InputDecoration(
+                labelText: 'Type',
+                prefixIcon: const Icon(Icons.home_outlined),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              items: ['Single', '1BK', '2BK', '1BHK', '2BHK'].map((type) {
+                return DropdownMenuItem(value: type, child: Text(type));
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedType = value;
+                });
+              },
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: minPriceController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Min price',
+                hintText: 'in Rs.',
+                prefixIcon: const Icon(Icons.currency_rupee),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: maxPriceController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Max price',
+                hintText: 'in Rs.',
+                prefixIcon: const Icon(Icons.currency_rupee),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _searchProperties,
+                icon: const Icon(Icons.search),
+                label: const Text(
+                  'Search for Property',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 10, 202, 20),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -192,102 +340,15 @@ class _BuyerState extends State<Buyer> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 12),
-            isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : properties.isEmpty
-                    ? const Text("No properties found")
-                    : Column(
-                        children:
-                            properties.map((prop) => buildPropertyCard(prop)).toList(),
-                      ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFilterForm() {
-    return Card(
-      color: Colors.blue.shade50,
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '📝 Filter by.',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Area / Location',
-                hintText: 'e.g. New Road, Kathmandu',
-                prefixIcon: const Icon(Icons.location_on),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+            if (isLoading)
+              const Center(child: CircularProgressIndicator())
+            else if (properties.isEmpty)
+              const Text("No properties found")
+            else
+              Column(
+                children:
+                    properties.map((prop) => buildPropertyCard(prop)).toList(),
               ),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              decoration: InputDecoration(
-                labelText: 'Type',
-                prefixIcon: const Icon(Icons.home_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              items: ['Single', '1BK', '2BK', '1BHK', '2BHK'].map((type) {
-                return DropdownMenuItem(value: type, child: Text(type));
-              }).toList(),
-              onChanged: (value) {},
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Min price',
-                hintText: 'in Rs.',
-                prefixIcon: const Icon(Icons.currency_rupee),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Max price',
-                hintText: 'in Rs.',
-                prefixIcon: const Icon(Icons.currency_rupee),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.search),
-                label: const Text(
-                  'Search for Property',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 10, 202, 20),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
